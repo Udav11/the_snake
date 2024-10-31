@@ -58,7 +58,10 @@ class Apple(GameObject):
 
     def __init__(self):
         super().__init__()
-        self.position = 1, 1
+        self.position = (
+            randint(0, GRID_WIDTH) * GRID_SIZE,
+            randint(0, GRID_HEIGHT) * GRID_SIZE
+        )
         self.body_color = APPLE_COLOR
 
     def draw(self):
@@ -109,6 +112,13 @@ def handle_keys(game_object):
                 game_object.next_direction = RIGHT
 
 
+def update_direction(self):
+    """# Метод обновления направления после нажатия на кнопку"""
+    if self.next_direction:
+        self.direction = self.next_direction
+        self.next_direction = None
+
+
 def main():
     """Инициализация PyGame:"""
     pygame.init()
@@ -120,7 +130,7 @@ def main():
         clock.tick(SPEED)
         handle_keys(apple)
         apple.draw()
-        snake.draw()
+        
         pygame.display.update()
         # Тут опишите основную логику игры.
         # ...
@@ -128,12 +138,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# Метод обновления направления после нажатия на кнопку
-
-
-def update_direction(self):
-    if self.next_direction:
-        self.direction = self.next_direction
-        self.next_direction = None
