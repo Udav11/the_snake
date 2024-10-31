@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import randint
 
 import pygame
 
@@ -60,10 +60,8 @@ class Apple(GameObject):
         super().__init__()
         self.body_color = APPLE_COLOR
 
-
     def randomize_position(self):
         """Spawn apple"""
-        
         self.position = (
             randint(0, GRID_WIDTH) * GRID_SIZE,
             randint(0, GRID_HEIGHT) * GRID_SIZE
@@ -78,7 +76,7 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """класс Snake"""
-    
+
     def __init__(self):
         super().__init__()
         self.length = 1
@@ -109,7 +107,7 @@ class Snake(GameObject):
         if head_y < 0:
             head_y = SCREEN_HEIGHT - GRID_SIZE
         elif head_y >= SCREEN_HEIGHT:
-            head_y = 0            
+            head_y = 0
         self.last = self.positions[-1]
         self.positions.insert(0, (head_x, head_y))
 
@@ -141,6 +139,7 @@ class Snake(GameObject):
         self.direction = RIGHT
         self.next_direction = None
 
+
 def handle_keys(game_object):
     """управление клавишами"""
     for event in pygame.event.get():
@@ -158,6 +157,7 @@ def handle_keys(game_object):
                 game_object.next_direction = RIGHT
     return game_object.next_direction
 
+
 def main():
     """Инициализация PyGame:"""
     pygame.init()
@@ -172,7 +172,7 @@ def main():
         snake.update_direction()
         clock.tick(SPEED)
         handle_keys(snake)
-        
+
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position()
@@ -184,7 +184,7 @@ def main():
             apple.randomize_position()
         apple.draw()
         snake.draw()
-        
+
         pygame.display.update()
         # Тут опишите основную логику игры.
         # ...
