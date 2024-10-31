@@ -58,6 +58,7 @@ class Apple(GameObject):
 
     def __init__(self):
         super().__init__()
+        self.position = 1, 1
         self.body_color = APPLE_COLOR
 
     def draw(self):
@@ -69,50 +70,30 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """класс Snake"""
-    pass
 
+    def __init__(self):
+        super().__init__()
 
-def main():
-    # Инициализация PyGame:
-    pygame.init()
-    # Тут нужно создать экземпляры классов.
-    apple = Apple()
+    def draw(self):
+        """Метод draw класса Snake"""
+        for position in self.positions[:-1]:
+            rect = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
+            pygame.draw.rect(screen, self.body_color, rect)
+            pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
-    while True:
-        clock.tick(SPEED)
-        apple.draw()
-        pygame.display.update()
-        # Тут опишите основную логику игры.
-        # ...
+        """Отрисовка головы змейки"""
+        head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, head_rect)
+        pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
 
-
-if __name__ == '__main__':
-    main()
-
-
-# # Метод draw класса Snake
-
-
-def draw(self):
-    for position in self.positions[:-1]:
-        rect = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
-        pygame.draw.rect(screen, self.body_color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
-
-    # Отрисовка головы змейки
-    head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-    pygame.draw.rect(screen, self.body_color, head_rect)
-    pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
-
-#     # Затирание последнего сегмента
-    if self.last:
-        last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
-
-# Функция обработки действий пользователя
+        if self.last:
+            """Затирание последнего сегмента"""
+            last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
 
 def handle_keys(game_object):
+    """управление клавишами"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -126,6 +107,28 @@ def handle_keys(game_object):
                 game_object.next_direction = LEFT
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
+
+
+def main():
+    """Инициализация PyGame:"""
+    pygame.init()
+    # Тут нужно создать экземпляры классов.
+    apple = Apple()
+    snake = Snake()
+
+    while True:
+        clock.tick(SPEED)
+        handle_keys(apple)
+        apple.draw()
+        snake.draw()
+        pygame.display.update()
+        # Тут опишите основную логику игры.
+        # ...
+
+
+if __name__ == '__main__':
+    main()
+
 
 # Метод обновления направления после нажатия на кнопку
 
