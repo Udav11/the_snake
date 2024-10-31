@@ -40,31 +40,55 @@ clock = pygame.time.Clock()
 
 
 # Тут опишите все классы игры.
-...
+
+class GameObject:
+    """класс GameObject"""
+
+    def __init__(self):
+        self.position = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
+        self.body_color = None
+
+    def draw(self):
+        """Метод draw класса GameObject"""
+        pass
+
+
+class Apple(GameObject):
+    """класс Apple"""
+
+    def __init__(self):
+        super().__init__()
+        self.body_color = APPLE_COLOR
+
+    def draw(self):
+        """Метод draw класса Apple"""
+        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+
+
+class Snake(GameObject):
+    """класс Snake"""
+    pass
 
 
 def main():
     # Инициализация PyGame:
     pygame.init()
     # Тут нужно создать экземпляры классов.
-    ...
+    apple = Apple()
 
     while True:
         clock.tick(SPEED)
-
-    # Тут опишите основную логику игры.
-    # ...
+        apple.draw()
+        pygame.display.update()
+        # Тут опишите основную логику игры.
+        # ...
 
 
 if __name__ == '__main__':
     main()
 
-
-# Метод draw класса Apple
-def draw(self):
-    rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-    pygame.draw.rect(screen, self.body_color, rect)
-    pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 # # Метод draw класса Snake
 
