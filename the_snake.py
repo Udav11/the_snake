@@ -58,11 +58,14 @@ class Apple(GameObject):
 
     def __init__(self):
         super().__init__()
+        self.body_color = APPLE_COLOR
+
+    def randomize_position(self):
+        """Spawn apple"""
         self.position = (
             randint(0, GRID_WIDTH) * GRID_SIZE,
             randint(0, GRID_HEIGHT) * GRID_SIZE
         )
-        self.body_color = APPLE_COLOR
 
     def draw(self):
         """Метод draw класса Apple"""
