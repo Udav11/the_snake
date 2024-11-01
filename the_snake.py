@@ -26,6 +26,12 @@ APPLE_COLOR = (255, 0, 0)
 # Цвет змейки
 SNAKE_COLOR = (0, 255, 0)
 
+# Цвет камня
+ROCK_COLOR = (105, 105, 105)
+
+# Цвет мусора
+GARBAGE_COLOR = (160, 82, 45)
+
 # Скорость движения змейки:
 SPEED = 20
 
@@ -51,6 +57,48 @@ class GameObject:
     def draw(self):
         """Метод draw класса GameObject"""
         pass
+
+
+class Rock(GameObject):
+    """класс камня"""
+
+    def __init__(self):
+        super().__init__()
+        self.body_color = ROCK_COLOR
+
+    def randomize_position(self):
+        """Spawn rock"""
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+        )
+
+    def draw(self):
+        """Метод draw класса Rock"""
+        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+
+
+class Garbage(GameObject):
+    """класс мусора"""
+
+    def __init__(self):
+        super().__init__()
+        self.body_color = GARBAGE_COLOR
+
+    def randomize_position(self):
+        """Spawn garbage"""
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+        )
+
+    def draw(self):
+        """Метод draw класса garbage"""
+        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Apple(GameObject):
@@ -109,8 +157,9 @@ class Snake(GameObject):
             head_y = 0
         self.last = self.positions[-1]
         self.positions.insert(0, (head_x, head_y))
-        if len(self.positions) > self.length:
-            self.positions.pop(self.length)
+        if self.length >= 1:
+            if len(self.positions) > self.length:
+                self.positions.pop(self.length)
 
     def draw(self):
         """Метод draw класса Snake"""
@@ -165,30 +214,65 @@ def main():
     # Тут нужно создать экземпляры классов.
     apple = Apple()
     snake = Snake()
+    rock = Rock()
+    garbage = Garbage()
     apple.randomize_position()
+    rock.randomize_position()
+    garbage.randomize_position()
     snake.move()
     snake.update_direction()
+    SPEED = 10
     while True:
         snake.move()
         snake.update_direction()
         clock.tick(SPEED)
         handle_keys(snake)
 
-        if snake.get_head_position() == apple.position:
+        while snake.length < 3:
+            SPEED = 10
+
+        while snake.length > 3 and snake.length < 6:
+            """Увеличиваем скорость"""
+            SPEED = 15
+
+        while snake.length >= 6:
+            """увеличиваем до максимума"""
+            SPEED = 20
+
+        if snake.get_head_position() == apple.position or apple.position == snake.positions[1:]:
+            """съедаем яблоко"""
             snake.length += 1
             apple.randomize_position()
         if snake.get_head_position() in snake.positions[1:]:
+            """начинаем заново если ударились об себя"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
             apple.randomize_position()
-        if apple.position == snake.positions[1:]:
+        if snake.get_head_position() == rock.position:
+            """начинаем заново если ударились об камень"""
+            snake.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
+            rock.randomize_position()
+        if snake.get_head_position() == garbage.position:
+            """съедаем мусор"""
+            snake.length -= 1
+            garbage.randomize_position()
+            snake.positions.pop(snake.length)
+            screen.fill(BOARD_BACKGROUND_COLOR)
+
+        if snake.length < 1:
+            """начинаем заново если длина меньше 1"""
+            snake.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
+            rock.randomize_position()
             apple.randomize_position()
+            garbage.randomize_position()
         apple.draw()
         snake.draw()
+        rock.draw()
+        garbage.draw()
 
         pygame.display.update()
-        # Тут опишите основную логику игры.
-        # ...
 
 
 if __name__ == '__main__':
