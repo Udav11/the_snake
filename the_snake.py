@@ -63,8 +63,8 @@ class Apple(GameObject):
     def randomize_position(self):
         """Spawn apple"""
         self.position = (
-            randint(0, GRID_WIDTH) * GRID_SIZE,
-            randint(0, GRID_HEIGHT) * GRID_SIZE
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
 
     def draw(self):
@@ -84,7 +84,6 @@ class Snake(GameObject):
         self.direction = RIGHT
         self.next_direction = None
         self.body_color = SNAKE_COLOR
-        self.last = None
 
     def update_direction(self):
         """# Метод обновления направления после нажатия на кнопку"""
@@ -110,6 +109,8 @@ class Snake(GameObject):
             head_y = 0
         self.last = self.positions[-1]
         self.positions.insert(0, (head_x, head_y))
+        if len(self.positions) > self.length:
+            self.positions.pop(self.length)
 
     def draw(self):
         """Метод draw класса Snake"""
