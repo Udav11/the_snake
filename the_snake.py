@@ -60,42 +60,42 @@ class GameObject:
 
 
 class Rock(GameObject):
-    """класс камня"""
+    """Класс камня"""
 
     def __init__(self):
         super().__init__()
         self.body_color = ROCK_COLOR
 
     def randomize_position(self):
-        """Spawn rock"""
+        """Случайный спавн камня"""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
 
     def draw(self):
-        """Метод draw класса Rock"""
+        """Рисуем камень"""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.body_color, rect)
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Garbage(GameObject):
-    """класс мусора"""
+    """Класс плохой еды"""
 
     def __init__(self):
         super().__init__()
         self.body_color = GARBAGE_COLOR
 
     def randomize_position(self):
-        """Spawn garbage"""
+        """Спавн плохой еды"""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
 
     def draw(self):
-        """Метод draw класса garbage"""
+        """Рисуем плохую еду"""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.body_color, rect)
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
@@ -109,7 +109,7 @@ class Apple(GameObject):
         self.body_color = APPLE_COLOR
 
     def randomize_position(self):
-        """Spawn apple"""
+        """Случайное появление яблока"""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
@@ -134,7 +134,7 @@ class Snake(GameObject):
         self.body_color = SNAKE_COLOR
 
     def update_direction(self):
-        """# Метод обновления направления после нажатия на кнопку"""
+        """Метод обновления направления после нажатия на кнопку"""
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
@@ -158,6 +158,7 @@ class Snake(GameObject):
         self.last = self.positions[-1]
         self.positions.insert(0, (head_x, head_y))
         if self.length >= 1:
+            """Контроль стирания элементов змеи"""
             if len(self.positions) > self.length:
                 self.positions.pop(self.length)
 
@@ -179,7 +180,7 @@ class Snake(GameObject):
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
     def get_head_position(self):
-        """Get head pos"""
+        """Получаем координаты головы змеи"""
         return self.positions[0]
 
     def reset(self):
@@ -191,7 +192,7 @@ class Snake(GameObject):
 
 
 def handle_keys(game_object):
-    """управление клавишами"""
+    """Управление клавишами"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -221,23 +222,11 @@ def main():
     garbage.randomize_position()
     snake.move()
     snake.update_direction()
-    SPEED = 10
     while True:
         snake.move()
         snake.update_direction()
         clock.tick(SPEED)
         handle_keys(snake)
-
-        while snake.length < 3:
-            SPEED = 10
-
-        while snake.length > 3 and snake.length < 6:
-            """Увеличиваем скорость"""
-            SPEED = 15
-
-        while snake.length >= 6:
-            """увеличиваем до максимума"""
-            SPEED = 20
 
         if snake.get_head_position() == apple.position or apple.position == snake.positions[1:]:
             """съедаем яблоко"""
@@ -271,7 +260,6 @@ def main():
         snake.draw()
         rock.draw()
         garbage.draw()
-
         pygame.display.update()
 
 
