@@ -228,7 +228,8 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
 
-        if snake.get_head_position() == apple.position or apple.position == snake.positions[1:]:
+        if (snake.get_head_position() == apple.position
+           or apple.position == snake.positions[1:]):
             """съедаем яблоко"""
             snake.length += 1
             apple.randomize_position()
