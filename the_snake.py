@@ -92,7 +92,7 @@ class StaticObject(GameObject):
 class Rock(StaticObject):
     """Класс камня"""
 
-    def __init__(self, occupied):
+    def __init__(self, occupied=[]):
         super().__init__(position=self.randomize_position(),
                          color=ROCK_COLOR, occupied=[]
                          )
@@ -101,7 +101,7 @@ class Rock(StaticObject):
 class Garbage(StaticObject):
     """Класс плохой еды"""
 
-    def __init__(self, occupied):
+    def __init__(self, occupied=[]):
         super().__init__(position=self.randomize_position(),
                          color=GARBAGE_COLOR, occupied=[]
                          )
@@ -110,7 +110,7 @@ class Garbage(StaticObject):
 class Apple(StaticObject):
     """класс Apple"""
 
-    def __init__(self, occupied):
+    def __init__(self, occupied=[]):
         super().__init__(position=self.randomize_position(),
                          color=APPLE_COLOR, occupied=[]
                          )
