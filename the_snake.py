@@ -135,16 +135,11 @@ class Snake(GameObject):
     def move(self):
         """Метод отвечающий за движение змейки."""
         head_x, head_y = self.get_head_position()
-        head_x += self.direction[0] * GRID_SIZE
-        head_y += self.direction[1] * GRID_SIZE
-        if head_x < 0:
-            head_x = SCREEN_WIDTH - GRID_SIZE
-        elif head_x >= SCREEN_WIDTH:
-            head_x = 0
-        if head_y < 0:
-            head_y = SCREEN_HEIGHT - GRID_SIZE
-        elif head_y >= SCREEN_HEIGHT:
-            head_y = 0
+        dir_x = self.direction[0]
+        dir_y = self.direction[1]
+        head_x = (head_x + (dir_x * GRID_SIZE)) % SCREEN_WIDTH
+        head_y = (head_y + (dir_y * GRID_SIZE)) % SCREEN_HEIGHT
+
         self.positions.insert(0, (head_x, head_y))
         self.last = (
             self.positions.pop() if self.length < len(self.positions)
