@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 
 import pygame as pg
 
@@ -55,66 +55,22 @@ class GameObject:
 
     def __init__(self, position=SCREEN_CENTER, color=None):
         self.position = SCREEN_CENTER
-        self.body_color = None
+        self.body_color = color
 
     def draw(self):
         """Метод draw класса GameObject"""
-        raise NotImplementedError('Метод должен быть определен\
-                                  в дочерних классах'
+        raise NotImplementedError('Метод должен быть определен'
+                                  'в дочерних классах'
                                   )
 
 
 class StaticObject(GameObject):
     """Класс для статичных объектов"""
 
-    def __init__(self, position=SCREEN_CENTER, color=None):
+    def __init__(self, position=SCREEN_CENTER, color=None, occupied=[]):
         super().__init__(position, color)
-
-    def randomize_position(self):
-        """Случайный спавн объекта"""
-        self.position = (
-            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        )
-
-
-class Rock(StaticObject):
-    """Класс камня"""
-
-    def __init__(self):
-        super().__init__()
         self.randomize_position()
-        self.body_color = ROCK_COLOR
-
-    def draw(self):
-        """Рисуем камень"""
-        rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
-
-
-class Garbage(StaticObject):
-    """Класс плохой еды"""
-
-    def __init__(self):
-        super().__init__()
-        self.randomize_position()
-        self.body_color = GARBAGE_COLOR
-
-    def draw(self):
-        """Рисуем плохую еду"""
-        rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
-
-
-class Apple(StaticObject):
-    """класс Apple"""
-
-    def __init__(self):
-        super().__init__()
-        self.randomize_position()
-        self.body_color = APPLE_COLOR
+        self.draw()
 
     def draw(self):
         """Метод draw класса Apple"""
@@ -122,17 +78,53 @@ class Apple(StaticObject):
         pg.draw.rect(screen, self.body_color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
+    def randomize_position(self, occupied=[]):
+        """Случайный спавн объекта"""
+        while True:
+            self.position = (
+                randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+            )
+            if self.position not in occupied:
+                break
+
+
+class Rock(StaticObject):
+    """Класс камня"""
+
+    def __init__(self):
+        super().__init__(position=self.randomize_position(),
+                         color=ROCK_COLOR, occupied=[]
+                         )
+
+
+class Garbage(StaticObject):
+    """Класс плохой еды"""
+
+    def __init__(self):
+        super().__init__(position=self.randomize_position(),
+                         color=GARBAGE_COLOR, occupied=[]
+                         )
+
+
+class Apple(StaticObject):
+    """класс Apple"""
+
+    def __init__(self, occupied):
+        super().__init__(position=self.randomize_position(),
+                         color=APPLE_COLOR, occupied=[]
+                         )
+
 
 class Snake(GameObject):
     """класс Snake"""
 
     def __init__(self):
-        super().__init__()
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
+        super().__init__(position=SCREEN_CENTER, color=SNAKE_COLOR)
+        self.positions = [self.position]
         self.direction = RIGHT
         self.next_direction = None
         self.length = 1
-        self.body_color = SNAKE_COLOR
 
     def update_direction(self):
         """Метод обновления направления после нажатия на кнопку"""
@@ -145,12 +137,10 @@ class Snake(GameObject):
         head_x, head_y = self.get_head_position()
         head_x += self.direction[0] * GRID_SIZE
         head_y += self.direction[1] * GRID_SIZE
-
         if head_x < 0:
             head_x = SCREEN_WIDTH - GRID_SIZE
         elif head_x >= SCREEN_WIDTH:
             head_x = 0
-
         if head_y < 0:
             head_y = SCREEN_HEIGHT - GRID_SIZE
         elif head_y >= SCREEN_HEIGHT:
@@ -181,7 +171,7 @@ class Snake(GameObject):
         self.length = 1
         self.last = None
         self.positions = [self.position]
-        self.direction = RIGHT
+        self.direction = choice((RIGHT, LEFT, UP, DOWN))
         self.next_direction = None
 
 
@@ -209,8 +199,8 @@ def main():
     """Инициализация pg:"""
     pg.init()
     # Тут нужно создать экземпляры классов.
-    apple = Apple()
     snake = Snake()
+    apple = Apple(snake)
     rock = Rock()
     garbage = Garbage()
     while True:
@@ -222,19 +212,19 @@ def main():
             """съедаем яблоко"""
             snake.length += 1
             apple.randomize_position()
-        if snake.get_head_position() in snake.positions[1:]:
+        elif snake.get_head_position() in snake.positions[1:]:
             """начинаем заново если ударились об себя"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            apple()
-            garbage()
-            rock()
-        if snake.get_head_position() == rock.position:
+            apple.randomize_position()
+            garbage.randomize_position()
+            rock.randomize_position()
+        elif snake.get_head_position() == rock.position:
             """начинаем заново если ударились об камень"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
             rock.randomize_position()
-        if snake.get_head_position() == garbage.position:
+        elif snake.get_head_position() == garbage.position:
             """съедаем мусор"""
             snake.length -= 1
             garbage.randomize_position()
