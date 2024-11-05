@@ -69,7 +69,7 @@ class StaticObject(GameObject):
 
     def __init__(self, position=SCREEN_CENTER, color=None, occupied=[]):
         super().__init__(position, color)
-        self.randomize_position()
+        self.randomize_position(occupied)
         self.draw()
 
     def draw(self):
@@ -92,7 +92,7 @@ class StaticObject(GameObject):
 class Rock(StaticObject):
     """Класс камня"""
 
-    def __init__(self):
+    def __init__(self, occupied):
         super().__init__(position=self.randomize_position(),
                          color=ROCK_COLOR, occupied=[]
                          )
@@ -101,7 +101,7 @@ class Rock(StaticObject):
 class Garbage(StaticObject):
     """Класс плохой еды"""
 
-    def __init__(self):
+    def __init__(self, occupied):
         super().__init__(position=self.randomize_position(),
                          color=GARBAGE_COLOR, occupied=[]
                          )
@@ -194,35 +194,40 @@ def main():
     """Инициализация pg:"""
     pg.init()
     # Тут нужно создать экземпляры классов.
+    occupied = []
     snake = Snake()
-    apple = Apple(snake)
-    rock = Rock()
-    garbage = Garbage()
+    apple = Apple(occupied)
+    rock = Rock(occupied)
+    garbage = Garbage(occupied)
+
     while True:
         snake.move()
         snake.update_direction()
         clock.tick(SPEED)
         handle_keys(snake)
+        occupied.append((apple.position, rock.position,
+                         garbage.position, snake.positions)
+                        )
         if (snake.get_head_position() == apple.position):
             """съедаем яблоко"""
             snake.length += 1
-            apple.randomize_position()
+            apple.randomize_position(occupied)
         elif snake.get_head_position() in snake.positions[1:]:
             """начинаем заново если ударились об себя"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            apple.randomize_position()
-            garbage.randomize_position()
-            rock.randomize_position()
+            apple.randomize_position(occupied)
+            garbage.randomize_position(occupied)
+            rock.randomize_position(occupied)
         elif snake.get_head_position() == rock.position:
             """начинаем заново если ударились об камень"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            rock.randomize_position()
+            rock.randomize_position(occupied)
         elif snake.get_head_position() == garbage.position:
             """съедаем мусор"""
             snake.length -= 1
-            garbage.randomize_position()
+            garbage.randomize_position(occupied)
             snake.positions.pop(snake.length)
             screen.fill(BOARD_BACKGROUND_COLOR)
 
@@ -230,9 +235,9 @@ def main():
             """начинаем заново если длина меньше 1"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            rock.randomize_position()
-            apple.randomize_position()
-            garbage.randomize_position()
+            rock.randomize_position(occupied)
+            apple.randomize_position(occupied)
+            garbage.randomize_position(occupied)
         apple.draw()
         snake.draw()
         rock.draw()
