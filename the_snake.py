@@ -109,7 +109,7 @@ class Apple(StaticObject):
 class Snake(GameObject):
     """класс Snake"""
 
-    def __init__(self, position=SCREEN_CENTER, color=SNAKE_COLOR):
+    def __init__(self, position=SCREEN_CENTER, color=SNAKE_COLOR, last=None):
         super().__init__(position, color)
         self.positions = [self.position]
         self.direction = RIGHT
