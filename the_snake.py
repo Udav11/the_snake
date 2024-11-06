@@ -48,20 +48,17 @@ pg.display.set_caption('Змейка')
 clock = pg.time.Clock()
 
 
-# Тут опишите все классы игры.
-
 class GameObject:
     """класс GameObject"""
 
     def __init__(self, position=SCREEN_CENTER, color=None):
-        self.position = SCREEN_CENTER
+        self.position = position
         self.body_color = color
 
     def draw(self):
         """Метод draw класса GameObject"""
         raise NotImplementedError('Метод должен быть определен'
-                                  'в дочерних классах'
-                                  )
+                                  'в дочерних классах')
 
 
 class StaticObject(GameObject):
@@ -70,7 +67,6 @@ class StaticObject(GameObject):
     def __init__(self, position=SCREEN_CENTER, color=None, occupied=[]):
         super().__init__(position, color)
         self.randomize_position(occupied)
-        self.draw()
 
     def draw(self):
         """Метод draw класса Apple"""
@@ -83,8 +79,7 @@ class StaticObject(GameObject):
         while True:
             self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            )
+                randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
             if self.position not in occupied:
                 break
 
@@ -92,35 +87,30 @@ class StaticObject(GameObject):
 class Rock(StaticObject):
     """Класс камня"""
 
-    def __init__(self, occupied=[]):
-        super().__init__(position=self.randomize_position(),
-                         color=ROCK_COLOR, occupied=[]
-                         )
+    def __init__(self, position=SCREEN_CENTER, color=ROCK_COLOR, occupied=[]):
+        super().__init__(position, color)
 
 
 class Garbage(StaticObject):
     """Класс плохой еды"""
 
-    def __init__(self, occupied=[]):
-        super().__init__(position=self.randomize_position(),
-                         color=GARBAGE_COLOR, occupied=[]
-                         )
+    def __init__(self, position=SCREEN_CENTER, color=GARBAGE_COLOR,
+                 occupied=[]):
+        super().__init__(position, color)
 
 
 class Apple(StaticObject):
     """класс Apple"""
 
-    def __init__(self, occupied=[]):
-        super().__init__(position=self.randomize_position(),
-                         color=APPLE_COLOR, occupied=[]
-                         )
+    def __init__(self, position=SCREEN_CENTER, color=APPLE_COLOR, occupied=[]):
+        super().__init__(position, color)
 
 
 class Snake(GameObject):
     """класс Snake"""
 
-    def __init__(self):
-        super().__init__(position=SCREEN_CENTER, color=SNAKE_COLOR)
+    def __init__(self, position=SCREEN_CENTER, color=SNAKE_COLOR):
+        super().__init__(position, color)
         self.positions = [self.position]
         self.direction = RIGHT
         self.next_direction = None
@@ -135,8 +125,7 @@ class Snake(GameObject):
     def move(self):
         """Метод отвечающий за движение змейки."""
         head_x, head_y = self.get_head_position()
-        dir_x = self.direction[0]
-        dir_y = self.direction[1]
+        dir_x, dir_y = self.direction
         head_x = (head_x + (dir_x * GRID_SIZE)) % SCREEN_WIDTH
         head_y = (head_y + (dir_y * GRID_SIZE)) % SCREEN_HEIGHT
 
@@ -190,24 +179,35 @@ def handle_keys(game_object):
                 raise SystemExit
 
 
+def update_positions(snake, static_objects):
+    """Обновление координат статичных объектов"""
+    occupied = [*snake.positions]
+    for static_object in static_objects:
+        static_object.randomize_position(occupied)
+        occupied.append(static_object.position)
+
+
 def main():
     """Инициализация pg:"""
     pg.init()
     # Тут нужно создать экземпляры классов.
     occupied = []
     snake = Snake()
+    occupied.append(snake.positions)
     apple = Apple(occupied)
+    occupied.append(apple.position)
     rock = Rock(occupied)
+    occupied.append(rock.position)
     garbage = Garbage(occupied)
+    occupied.append(garbage.position)
 
     while True:
         snake.move()
         snake.update_direction()
         clock.tick(SPEED)
         handle_keys(snake)
-        occupied.append((apple.position, rock.position,
-                         garbage.position, snake.positions)
-                        )
+        occupied = [apple.position, garbage.position,
+                    rock.position, *snake.positions]
         if (snake.get_head_position() == apple.position):
             """съедаем яблоко"""
             snake.length += 1
@@ -216,14 +216,12 @@ def main():
             """начинаем заново если ударились об себя"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            apple.randomize_position(occupied)
-            garbage.randomize_position(occupied)
-            rock.randomize_position(occupied)
+
         elif snake.get_head_position() == rock.position:
             """начинаем заново если ударились об камень"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            rock.randomize_position(occupied)
+            update_positions(snake, [apple, rock, garbage])
         elif snake.get_head_position() == garbage.position:
             """съедаем мусор"""
             snake.length -= 1
@@ -235,9 +233,8 @@ def main():
             """начинаем заново если длина меньше 1"""
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
-            rock.randomize_position(occupied)
-            apple.randomize_position(occupied)
-            garbage.randomize_position(occupied)
+            update_positions(snake, [apple, rock, garbage])
+
         apple.draw()
         snake.draw()
         rock.draw()
